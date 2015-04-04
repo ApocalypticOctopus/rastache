@@ -27,7 +27,11 @@
 
 ;; Returns the value of `key' in a rastache context if any. Otherwise
 ;; #f.
-(define (lookup context key) (hash-ref context key #f))
+(define (lookup context key) 
+  (cond
+    [(hash? context) (hash-ref context key #f)]
+    [(procedure? context) (apply context (list key))]
+    [else context]))
 
 ;; Returns the value of `key' in a rastache context if any. If the
 ;; value is a lambda, then the lambda is applied. If `key' doesn't
