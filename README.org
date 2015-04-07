@@ -8,12 +8,12 @@ Rastache is compliant with the [[https://github.com/mustache/spec/tree/master][M
    Rastache can be installed as a collection within Racket with
    package manager:
    #+BEGIN_SRC sh
-   $ raco pkg install "git://github.com/rcherrueau/rastache.git?path=rastache"
+   $ raco pkg install "git://github.com/ApocalypticOctopus/rastache.git?path=rastache"
    #+END_SRC
 
    Or manually:
    #+BEGIN_SRC sh
-   $ git clone git://github.com/rcherrueau/rastache.git
+   $ git clone git://github.com/ApocalypticOctopus/rastache.git
    $ cd rastache/rastache
    $ raco link .
    $ raco setup
@@ -67,14 +67,14 @@ Rastache also offers facilities for reading strings and files.
 (rast-compile/open-file "path/to/file.mustache")
 #+END_SRC
 
-See [[https://github.com/rcherrueau/rastache/tree/master/examples][examples]] directory for more usage examples.
+See [[https://github.com/ApocalypticOctopus/rastache/tree/master/examples][examples]] directory for more usage examples.
 
 ** Running Tests
    At the moment the project is under development but passes all
    [[https://github.com/mustache/spec][Mustache spec tests]]. If you want to run the tests yourself, do the
    following:
    #+BEGIN_SRC sh
-   $ git clone git://github.com/rcherrueau/rastache.git
+   $ git clone git://github.com/ApocalypticOctopus/rastache.git
    $ cd rastache/rastache/tests/
    $ raco test tests.rkt
    #+END_SRC
@@ -346,7 +346,7 @@ See [[https://github.com/rcherrueau/rastache/tree/master/examples][examples]] di
 
     Template:
     #+BEGIN_SRC mustache
-    Hello{{>https://github.com/rcherrueau/rastache/raw/master/rastache/tests/partials/names}}
+    Hello{{>https://github.com/ApocalypticOctopus/rastache/raw/master/rastache/tests/partials/names}}
     #+END_SRC
 
     Context:
