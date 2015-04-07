@@ -1,4 +1,4 @@
-#lang racket/base
+#lang racket
 
 ;                      /\ \__                /\ \
 ;  _ __    __      ____\ \ ,_\    __      ___\ \ \___      __
@@ -21,55 +21,26 @@
          racket/match
          net/url
          xml)
+(require (planet williams/describe/describe))
 
 ;; Returns #t if value is a rastache context, #f otherwise.
-(define (rast-context? x) (or (hash? x) (and (procedure? x) (= (procedure-arity x) 1))))
+(define (rast-context? x) (or (hash? x) (procedure? x)))
 
 ;; Returns the value of `key' in a rastache context if any. Otherwise
 ;; #f.
-(define (lookup context key) 
+(define (lookup context key)
   (cond
     [(hash? context) (hash-ref context key #f)]
-    [(procedure? context) (apply context (list key))]
+    [(and (procedure? context) (eq? 0 (procedure-arity context))) (context)]
+    [(procedure? context) ((curry context) key)]
     [else context]))
+    
 
 ;; Returns the value of `key' in a rastache context if any. If the
 ;; value is a lambda, then the lambda is applied. If `key' doesn't
 ;; exist in the rastache context, it returns #f.
 (define (var-lookup context key)
-  (let ([var (lookup context key)])
-    (cond
-     ;; If var is a lambda: evaluate it
-     [(procedure? var)
-      (cond
-       ;; 0 or arity-at-least arg
-       [(or (eq? (procedure-arity var) 0)
-            (arity-at-least? (procedure-arity var)))
-        (var)]
-       ;; 1 arg: give context
-       [(eq? (procedure-arity var) 1)
-        (var context)]
-       ;; 2 args: give context and render-function
-       [(eq? (procedure-arity var) 2)
-        (var context
-             (λ (txt)
-                (let ([o (open-output-string)])
-                  (render
-                   ;; A lambda's return value should be parse with the
-                   ;; default delimiters (see Lambdas tests >
-                   ;; Interpolation - Alternate Delimiters)
-                   (parameterize ([open-tag "{{"]
-                                  [close-tag "}}"])
-                    (tokenize (open-input-string txt)))
-                   context
-                   o)
-                  (get-output-string o))))]
-       [else
-        (error (format (string-append "Error: The lambda ~s "
-                                      "should have zero, one "
-                                      "or two argument(s)") var))])]
-     ;; Else var is a val: return it
-     [else var])))
+  (lookup context key))
 
 ;; Returns the value of a `key' in a rastache context when current
 ;; token is a section or inverted section. If `key' doesn't exist in
@@ -97,10 +68,14 @@
 (define (non-empty-list? val)
   (and (list? val) (not (null? val))))
 
+(define (call-if-procedure x)
+  (cond [(procedure? x) (x)]
+        [else x]))
+
 ;; Returns an html escaped string.
 (define (htmlescape-string string)
   (regexp-replace* #rx"\""
-                   (xexpr->string string)
+                   (xexpr->string (call-if-procedure string))
                    (regexp-replace-quote "&quot;")))
 
 ;; Render a mustache tokens thanks to the rendering context.
@@ -156,8 +131,7 @@
                      ;; `val' is not a rastache context. Render with
                      ;; general context overriding by `val' put at
                      ;; `period-name' position
-                     [(hash? the-ctx) (hash-set the-ctx period-name val)]
-                     [else #f]))])
+                     [else (hash-set the-ctx period-name val)]))])
          (_render (cdr the-tokens) the-ctx)]
 
         ;; Section
@@ -181,8 +155,7 @@
                          ;; `the-val' is not a rastache context.
                          ;; Render with general context overriding by
                          ;; `the-val' put at `period-name' position
-                         [(hash? the-ctx) (hash-set the-ctx period-name the-val)]
-                         [else #f])))
+                         [else (hash-set the-ctx period-name the-val)])))
             val)]
           ;; Lambda
           [(procedure? val)
@@ -212,8 +185,7 @@
                      ;; `val' is not a rastache context.Render with
                      ;; general context overriding by `val' put at
                      ;; `period-name' position
-                     [(hash? the-ctx) (hash-set the-ctx period-name val)]
-                     [else #f]))])
+                     [else (hash-set the-ctx period-name val)]))])
          (_render (cdr the-tokens) the-ctx)]
 
         ;; Inverted Section
@@ -255,8 +227,7 @@
                      ;; `val' is not a rastache context. Render with
                      ;; general context overriding by `val' put at
                      ;; `period-name' position
-                     [(hash? the-ctx) (hash-set the-ctx period-name val)]
-                     [else #f]))])
+                     [else (hash-set the-ctx period-name val)]))])
          (_render (cdr the-tokens) the-ctx)]
 
         ;; Partial
