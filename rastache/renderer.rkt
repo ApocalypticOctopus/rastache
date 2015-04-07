@@ -156,7 +156,8 @@
                      ;; `val' is not a rastache context. Render with
                      ;; general context overriding by `val' put at
                      ;; `period-name' position
-                     [else (hash-set the-ctx period-name val)]))])
+                     [(hash? the-ctx) (hash-set the-ctx period-name val)]
+                     [else #f]))])
          (_render (cdr the-tokens) the-ctx)]
 
         ;; Section
@@ -180,7 +181,8 @@
                          ;; `the-val' is not a rastache context.
                          ;; Render with general context overriding by
                          ;; `the-val' put at `period-name' position
-                         [else (hash-set the-ctx period-name the-val)])))
+                         [(hash? the-ctx) (hash-set the-ctx period-name the-val)]
+                         [else #f])))
             val)]
           ;; Lambda
           [(procedure? val)
@@ -210,7 +212,8 @@
                      ;; `val' is not a rastache context.Render with
                      ;; general context overriding by `val' put at
                      ;; `period-name' position
-                     [else (hash-set the-ctx period-name val)]))])
+                     [(hash? the-ctx) (hash-set the-ctx period-name val)]
+                     [else #f]))])
          (_render (cdr the-tokens) the-ctx)]
 
         ;; Inverted Section
@@ -252,7 +255,8 @@
                      ;; `val' is not a rastache context. Render with
                      ;; general context overriding by `val' put at
                      ;; `period-name' position
-                     [else (hash-set the-ctx period-name val)]))])
+                     [(hash? the-ctx) (hash-set the-ctx period-name val)]
+                     [else #f]))])
          (_render (cdr the-tokens) the-ctx)]
 
         ;; Partial

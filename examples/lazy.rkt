@@ -6,13 +6,11 @@
 #<<HERESTRING
 Hello {{name}}
 You have just won ${{value}}!
-{{#in_ca}}
-Well, ${{ taxed_value }}, after taxes.
-{{/in_ca}}
 Love, {{owner}}
 HERESTRING
 )
 
 (rast-compile/render (open-input-string template)
-                     (lambda (x) x)
+                     ;(make-hash (list (cons 'name (lambda () 's))))
+                     (lambda (x) (string-append (symbol->string x) "-parameter"))
                      (current-output-port))
